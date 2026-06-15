@@ -261,7 +261,7 @@ with st.sidebar:
         st.markdown(f"<div style='padding:0.2rem 0; font-size:0.87rem'>{name}</div>", unsafe_allow_html=True)
 
     st.divider()
-    st.caption("v1.0 · Owen · UDLAP 2026")
+    st.caption("v1.0 · Owen · 2026")
 
 # ── Hero ──
 st.markdown("""
