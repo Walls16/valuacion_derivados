@@ -176,9 +176,7 @@ $$V_{i,j} = e^{-r\Delta t}\left[p \cdot V_{i+1,j} + (1-p) \cdot V_{i+1,j+1}\righ
 ## Autor
 
 **Owen** — Estudiante de Actuaría, Universidad de las Américas Puebla (UDLAP)  
-Internship previo en Actinver (Global Equity). Investigación en estimación de riesgo latente con Dynamic Factor Models y filtro de Kalman (CIMAT).
 
-[![GitHub](https://img.shields.io/badge/GitHub-Walls16-181717?logo=github)](https://github.com/Walls16)
 
 ---
 
