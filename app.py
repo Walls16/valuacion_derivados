@@ -356,7 +356,7 @@ with col2:
 st.markdown("")
 st.markdown(
     "<div style='text-align:center; font-size:0.75rem; color:#6b7a99; padding-top:1rem'>"
-    "Valuación Cuantitativa de Derivados · UDLAP Actuaría · 2026"
+    "Valuación Cuantitativa de Derivados · Actuaría · 2026"
     "</div>",
     unsafe_allow_html=True
 )
