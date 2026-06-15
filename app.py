@@ -248,14 +248,14 @@ with st.sidebar:
     st.divider()
     st.markdown("**Navegación**")
     pages = {
-        "🏠 Inicio":                  None,
-        "📐 BSM":                     "pages/1_BSM.py",
-        "🌳 Árboles CRR":             "pages/2_CRR.py",
-        "〰 Heston":                   "pages/3_Heston.py",
-        "⚡ Merton — Saltos":          "pages/4_Merton.py",
-        "🔬 Complementos":             "pages/5_Complementos.py",
-        "⚖️ Comparativa":              "pages/6_Comparativa.py",
-        "📡 Subyacentes en Vivo":     "pages/7_LiveData.py",
+        "Inicio":                  None,
+        "BSM":                     "pages/1_BSM.py",
+        "Árboles CRR":             "pages/2_CRR.py",
+        "Heston":                   "pages/3_Heston.py",
+        "Merton — Saltos":          "pages/4_Merton.py",
+        "Complementos":             "pages/5_Complementos.py",
+        "Comparativa":              "pages/6_Comparativa.py",
+        "Subyacentes en Vivo":     "pages/7_LiveData.py",
     }
     for name in pages:
         st.markdown(f"<div style='padding:0.2rem 0; font-size:0.87rem'>{name}</div>", unsafe_allow_html=True)
