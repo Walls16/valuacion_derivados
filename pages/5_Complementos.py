@@ -59,15 +59,77 @@ with st.sidebar:
         st.session_state.dark_mode = dark_toggle
         st.rerun()
     st.divider()
-    mode = st.radio("Modo de visualización", ["Básico", "Avanzado"], index=0)
 
 st.markdown('<div class="page-eyebrow">Análisis Avanzado · Página 5</div>', unsafe_allow_html=True)
 st.markdown('<div class="page-title">Complementos</div>', unsafe_allow_html=True)
 st.markdown('<div class="page-sub">Griegas de primer y segundo orden, sonrisa de volatilidad, superficie IV, IV implícita desde precio de mercado, paridad put-call.</div>', unsafe_allow_html=True)
+
+st.markdown(f"""
+<div style="background:{card};border:1px solid {border};border-radius:10px;padding:1.4rem 1.6rem;margin:0 0 1.2rem 0;line-height:1.85">
+    <div style="font-size:0.7rem;font-family:JetBrains Mono,monospace;letter-spacing:0.14em;text-transform:uppercase;color:{accent};margin-bottom:0.9rem">
+        Las griegas — sensibilidades del precio de la opción
+    </div>
+    <p style="color:{text_main};font-size:0.88rem;margin:0 0 0.75rem 0">
+        Las <strong style="color:{text_main}">griegas</strong> son las derivadas parciales del precio de la opción con respecto
+        a sus parámetros. Son la herramienta central de la gestión de riesgo:
+        un market maker que vende opciones cubre su exposición monitoreando y neutralizando estas sensibilidades.
+        El conjunto de griegas describe completamente el comportamiento local del precio ante perturbaciones del mercado.
+    </p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.7rem 2rem;margin-bottom:0.9rem">
+        <div style="font-size:0.83rem">
+            <span style="color:{text_main};font-family:JetBrains Mono,monospace">&Delta; (Delta) = &part;C/&part;S</span><br>
+            <span style="color:{text_sub}">Cambio en el precio ante $1 en el subyacente.
+            Call ATM tiene &Delta; &asymp; 0.5. Es la proporción de subyacente para delta hedge.</span>
+        </div>
+        <div style="font-size:0.83rem">
+            <span style="color:{text_main};font-family:JetBrains Mono,monospace">&Gamma; (Gamma) = &part;&sup2;C/&part;S&sup2;</span><br>
+            <span style="color:{text_sub}">Tasa de cambio del delta. Gamma alto implica rebalanceo frecuente.
+            M&aacute;ximo ATM. Comprador de opciones es largo gamma.</span>
+        </div>
+        <div style="font-size:0.83rem">
+            <span style="color:{text_main};font-family:JetBrains Mono,monospace">&Theta; (Theta) = &part;C/&part;t</span><br>
+            <span style="color:{text_sub}">Decaimiento temporal diario. Negativo para el comprador.
+            Gamma y Theta tienen signo opuesto &mdash; son los dos lados del mismo riesgo.</span>
+        </div>
+        <div style="font-size:0.83rem">
+            <span style="color:{text_main};font-family:JetBrains Mono,monospace">&nu; (Vega) = &part;C/&part;&sigma;</span><br>
+            <span style="color:{text_sub}">Sensibilidad a la volatilidad. M&aacute;ximo ATM.
+            +1% en IV aumenta el precio en Vega/100.</span>
+        </div>
+        <div style="font-size:0.83rem">
+            <span style="color:{text_main};font-family:JetBrains Mono,monospace">Vanna = &part;&sup2;C/&part;S&part;&sigma;</span><br>
+            <span style="color:{text_sub}">C&oacute;mo cambia el delta cuando cambia la vol. Clave para cubrir portafolios
+            donde la IV var&iacute;a con el precio del subyacente.</span>
+        </div>
+        <div style="font-size:0.83rem">
+            <span style="color:{text_main};font-family:JetBrains Mono,monospace">Vomma = &part;&sup2;C/&part;&sigma;&sup2;</span><br>
+            <span style="color:{text_sub}">Convexidad respecto a la vol. Positivo para el comprador &mdash;
+            se beneficia de grandes movimientos en volatilidad.</span>
+        </div>
+    </div>
+    <div style="border-top:1px solid {border};margin:0.9rem 0"></div>
+    <div style="font-size:0.7rem;font-family:JetBrains Mono,monospace;letter-spacing:0.14em;text-transform:uppercase;color:{accent};margin-bottom:0.6rem">
+        La sonrisa de volatilidad &mdash; evidencia contra BSM
+    </div>
+    <p style="color:{text_main};font-size:0.88rem;margin:0 0 0.75rem 0">
+        Si BSM fuera correcto, la volatilidad impl&iacute;cita extra&iacute;da del mercado deber&iacute;a ser igual para todos los strikes.
+        En la pr&aacute;ctica no lo es: las opciones OTM (especialmente puts) tienen IV m&aacute;s alta que las ATM.
+        Este patr&oacute;n se acentu&oacute; despu&eacute;s del <strong style="color:{text_main}">crash de 1987</strong>,
+        cuando los mercados reconocieron que las colas son m&aacute;s pesadas de lo que BSM predice.
+    </p>
+    <p style="color:{text_sub};font-size:0.83rem;margin:0">
+        La sonrisa es informaci&oacute;n del mercado sobre la distribuci&oacute;n real de retornos.
+        Heston la genera via correlaci&oacute;n &rho; negativa entre precio y varianza.
+        Merton la genera via sesgo negativo en los saltos (&mu;j &lt; 0).
+        Ambas aproximaciones capturan el mismo fen&oacute;meno desde &aacute;ngulos distintos.
+    </p>
+</div>
+""", unsafe_allow_html=True)
+
 st.divider()
 
-# ── Shared params ──
-with st.expander("⚙️ Parámetros base", expanded=True):
+#  Shared params 
+with st.expander(" Parámetros base", expanded=True):
     c1, c2, c3 = st.columns(3)
     with c1:
         S     = st.number_input("S — precio subyacente", value=100.0, step=1.0, format="%.2f")
@@ -97,9 +159,9 @@ def plotly_layout(title=""):
 
 tab1, tab2, tab3, tab4 = st.tabs(["Griegas completas", "Sonrisa de volatilidad", "IV implícita", "Paridad put-call"])
 
-# ─────────────────────────────
+# 
 # TAB 1: Greeks
-# ─────────────────────────────
+# 
 with tab1:
     st.markdown('<div class="section-header">Griegas de primer orden</div>', unsafe_allow_html=True)
 
@@ -140,35 +202,62 @@ with tab1:
             </div>
             """, unsafe_allow_html=True)
 
-    if mode == "Avanzado":
-        st.markdown('<div class="section-header">Perfil de griegas vs S</div>', unsafe_allow_html=True)
-        greek_choice = st.selectbox("Graficar griega", ["Delta", "Gamma", "Theta", "Vega", "Rho", "Vanna", "Vomma"])
-        xs = np.linspace(max(S * 0.5, 1), S * 1.5, 200)
-        greek_map = {
-            "Delta":  (lambda eng: eng.greeks()["call_delta"], lambda eng: eng.greeks()["put_delta"]),
-            "Gamma":  (lambda eng: eng.greeks()["gamma"],      None),
-            "Theta":  (lambda eng: eng.greeks()["call_theta"], lambda eng: eng.greeks()["put_theta"]),
-            "Vega":   (lambda eng: eng.greeks()["vega"],       None),
-            "Rho":    (lambda eng: eng.greeks()["call_rho"],   lambda eng: eng.greeks()["put_rho"]),
-            "Vanna":  (lambda eng: eng.greeks()["vanna"],      None),
-            "Vomma":  (lambda eng: eng.greeks()["volga"],      None),
-        }
-        fn_call, fn_put = greek_map[greek_choice]
-        vals_call = [fn_call(BSMEngine(x, K, T, r, sigma, q)) for x in xs]
-        fig_g = go.Figure()
-        fig_g.add_trace(go.Scatter(x=xs, y=vals_call, name=f"{greek_choice} (Call)", line=dict(color=accent, width=2)))
-        if fn_put:
-            vals_put = [fn_put(BSMEngine(x, K, T, r, sigma, q)) for x in xs]
-            fig_g.add_trace(go.Scatter(x=xs, y=vals_put, name=f"{greek_choice} (Put)", line=dict(color="#a78bfa", width=2)))
-        fig_g.add_vline(x=K, line_dash="dot", line_color=text_sub, annotation_text="K")
-        fig_g.add_vline(x=S, line_dash="dot", line_color="#34d399", annotation_text="S")
-        fig_g.update_layout(**plotly_layout(f"{greek_choice} vs Precio subyacente"), height=340)
-        fig_g.update_xaxes(title="S")
-        st.plotly_chart(fig_g, use_container_width=True)
+    st.markdown('<div class="section-header">Perfil de griegas vs S</div>', unsafe_allow_html=True)
+    greek_choice = st.selectbox("Graficar griega", ["Delta", "Gamma", "Theta", "Vega", "Rho", "Vanna", "Vomma"])
+    xs = np.linspace(max(S * 0.5, 1), S * 1.5, 200)
+    greek_map = {
+        "Delta":  (lambda eng: eng.greeks()["call_delta"], lambda eng: eng.greeks()["put_delta"]),
+        "Gamma":  (lambda eng: eng.greeks()["gamma"],      None),
+        "Theta":  (lambda eng: eng.greeks()["call_theta"], lambda eng: eng.greeks()["put_theta"]),
+        "Vega":   (lambda eng: eng.greeks()["vega"],       None),
+        "Rho":    (lambda eng: eng.greeks()["call_rho"],   lambda eng: eng.greeks()["put_rho"]),
+        "Vanna":  (lambda eng: eng.greeks()["vanna"],      None),
+        "Vomma":  (lambda eng: eng.greeks()["volga"],      None),
+    }
+    fn_call, fn_put = greek_map[greek_choice]
+    vals_call = [fn_call(BSMEngine(x, K, T, r, sigma, q)) for x in xs]
+    fig_g = go.Figure()
+    fig_g.add_trace(go.Scatter(x=xs, y=vals_call, name=f"{greek_choice} (Call)", line=dict(color=accent, width=2)))
+    if fn_put:
+        vals_put = [fn_put(BSMEngine(x, K, T, r, sigma, q)) for x in xs]
+        fig_g.add_trace(go.Scatter(x=xs, y=vals_put, name=f"{greek_choice} (Put)", line=dict(color="#a78bfa", width=2)))
+    fig_g.add_vline(x=K, line_dash="dot", line_color=text_sub, annotation_text="K")
+    fig_g.add_vline(x=S, line_dash="dot", line_color="#34d399", annotation_text="S")
+    fig_g.update_layout(**plotly_layout(f"{greek_choice} vs Precio subyacente"), height=340)
+    fig_g.update_xaxes(title="S")
+    st.plotly_chart(fig_g, use_container_width=True)
 
-# ─────────────────────────────
+    #  Greek heatmap S x sigma 
+    st.markdown(f"<div style='font-size:0.72rem;color:{text_sub};text-transform:uppercase;letter-spacing:0.1em;margin:1.2rem 0 0.5rem 0'>Heatmap — {greek_choice} sobre grilla S × σ</div>", unsafe_allow_html=True)
+    Ss_hm   = np.linspace(max(S*0.6, 1), S*1.4, 35)
+    sigs_hm = np.linspace(0.05, 0.60, 35)
+    Z_hm    = np.zeros((len(sigs_hm), len(Ss_hm)))
+    fn_hm_call, fn_hm_put = greek_map[greek_choice]
+    for i, sv in enumerate(sigs_hm):
+        for j, sx in enumerate(Ss_hm):
+            try:
+                Z_hm[i, j] = fn_hm_call(BSMEngine(sx, K, T, r, sv, q))
+            except:
+                Z_hm[i, j] = 0.0
+    fig_hm = go.Figure(data=go.Heatmap(
+        z=Z_hm, x=Ss_hm, y=sigs_hm*100,
+        colorscale="RdBu" if greek_choice in ["Delta", "Theta", "Rho", "Vanna"] else "Blues",
+        zmid=0 if greek_choice in ["Delta", "Theta", "Rho", "Vanna"] else None,
+        colorbar=dict(title=greek_choice),
+    ))
+    fig_hm.add_vline(x=S, line_dash="dot", line_color="#34d399", annotation_text="S")
+    fig_hm.add_vline(x=K, line_dash="dot", line_color=text_sub, annotation_text="K")
+    fig_hm.add_hline(y=sigma*100, line_dash="dot", line_color=accent, annotation_text=f"σ={sigma*100:.0f}%")
+    _hm_layout = plotly_layout(f"{greek_choice} — Heatmap S × σ")
+    _hm_layout["height"] = 350
+    fig_hm.update_layout(**_hm_layout)
+    fig_hm.update_xaxes(title="S")
+    fig_hm.update_yaxes(title="σ (%)")
+    st.plotly_chart(fig_hm, use_container_width=True)
+
+# 
 # TAB 2: Vol Smile
-# ─────────────────────────────
+# 
 with tab2:
     st.markdown(f"<div style='font-size:0.82rem;color:{text_sub};margin-bottom:0.8rem'>Volatilidad implícita derivada de precios BSM. En un mundo BSM puro la superficie es plana; en mercados reales, inclinada (skew) o en forma de sonrisa.</div>", unsafe_allow_html=True)
 
@@ -204,43 +293,42 @@ with tab2:
         fig_smile.update_yaxes(title="Volatilidad Implícita (%)")
         st.plotly_chart(fig_smile, use_container_width=True)
 
-    if mode == "Avanzado":
-        # IV surface over maturity x strike
-        st.markdown('<div class="section-header">Superficie IV (maturity × strike)</div>', unsafe_allow_html=True)
-        maturities_surf = np.array([0.1, 0.25, 0.5, 1.0, 1.5, 2.0])
-        strikes_surf    = np.linspace(S * 0.7, S * 1.3, 30)
-        Z = np.zeros((len(maturities_surf), len(strikes_surf)))
+    # IV surface over maturity x strike
+    st.markdown('<div class="section-header">Superficie IV (maturity × strike)</div>', unsafe_allow_html=True)
+    maturities_surf = np.array([0.1, 0.25, 0.5, 1.0, 1.5, 2.0])
+    strikes_surf    = np.linspace(S * 0.7, S * 1.3, 30)
+    Z = np.zeros((len(maturities_surf), len(strikes_surf)))
 
-        for i, t_m in enumerate(maturities_surf):
-            for j, k_s in enumerate(strikes_surf):
-                mn = np.log(k_s / S)
-                base = sigma * 100
-                skew_contrib  = vol_skew * mn / np.sqrt(t_m)
-                smile_contrib = vol_smile_param * (mn**2) / t_m
-                term_struct   = -2 * (1 - np.exp(-t_m))  # slight term structure
-                Z[i, j] = base + skew_contrib + smile_contrib + term_struct
+    for i, t_m in enumerate(maturities_surf):
+        for j, k_s in enumerate(strikes_surf):
+            mn = np.log(k_s / S)
+            base = sigma * 100
+            skew_contrib  = vol_skew * mn / np.sqrt(t_m)
+            smile_contrib = vol_smile_param * (mn**2) / t_m
+            term_struct   = -2 * (1 - np.exp(-t_m))  # slight term structure
+            Z[i, j] = base + skew_contrib + smile_contrib + term_struct
 
-        fig_surf = go.Figure(data=[go.Surface(
-            z=Z, x=strikes_surf, y=maturities_surf,
-            colorscale="Blues" if dark else "RdBu",
-        )])
-        fig_surf.update_layout(
-            paper_bgcolor=paper_bg,
-            font=dict(color=text_main),
-            scene=dict(
-                xaxis=dict(title="Strike", backgroundcolor=plot_bg, gridcolor=grid_col),
-                yaxis=dict(title="Madurez (años)", backgroundcolor=plot_bg, gridcolor=grid_col),
-                zaxis=dict(title="IV (%)", backgroundcolor=plot_bg, gridcolor=grid_col),
-            ),
-            title=dict(text="Superficie de Volatilidad Implícita", font=dict(color=text_main, size=14)),
-            height=480,
-            margin=dict(l=0, r=0, t=40, b=0),
-        )
-        st.plotly_chart(fig_surf, use_container_width=True)
+    fig_surf = go.Figure(data=[go.Surface(
+        z=Z, x=strikes_surf, y=maturities_surf,
+        colorscale="Blues" if dark else "RdBu",
+    )])
+    fig_surf.update_layout(
+        paper_bgcolor=paper_bg,
+        font=dict(color=text_main),
+        scene=dict(
+            xaxis=dict(title="Strike", backgroundcolor=plot_bg, gridcolor=grid_col),
+            yaxis=dict(title="Madurez (años)", backgroundcolor=plot_bg, gridcolor=grid_col),
+            zaxis=dict(title="IV (%)", backgroundcolor=plot_bg, gridcolor=grid_col),
+        ),
+        title=dict(text="Superficie de Volatilidad Implícita", font=dict(color=text_main, size=14)),
+        height=480,
+        margin=dict(l=0, r=0, t=40, b=0),
+    )
+    st.plotly_chart(fig_surf, use_container_width=True)
 
-# ─────────────────────────────
+# 
 # TAB 3: Implied Vol Solver
-# ─────────────────────────────
+# 
 with tab3:
     st.markdown(f"<div style='font-size:0.82rem;color:{text_sub};margin-bottom:1rem'>Dado un precio de mercado observado, calcula la volatilidad implícita que lo reproduce bajo BSM. Método: Brent (bisección acelerada).</div>", unsafe_allow_html=True)
 
@@ -264,7 +352,7 @@ with tab3:
         else:
             st.error("No se encontró solución. Verifica que el precio sea arbitrage-free.")
 
-    if mode == "Avanzado" and not np.isnan(iv_result):
+    if not np.isnan(iv_result):
         # Verify: BSM price with solved IV should equal market price
         check_price = BSMEngine(S, K, T, r, iv_result, q).call_price() if opt_type_iv == "call" else BSMEngine(S, K, T, r, iv_result, q).put_price()
         st.markdown(f"""
@@ -274,9 +362,9 @@ with tab3:
         </div>
         """, unsafe_allow_html=True)
 
-# ─────────────────────────────
+# 
 # TAB 4: Put-Call Parity
-# ─────────────────────────────
+# 
 with tab4:
     st.markdown(f"<div style='font-size:0.82rem;color:{text_sub};margin-bottom:1rem'>La paridad put-call es una relación de no-arbitraje fundamental: C − P = S·e<sup>−qT</sup> − K·e<sup>−rT</sup></div>", unsafe_allow_html=True)
 
@@ -288,27 +376,26 @@ with tab4:
     col_p1.metric("C − P (LHS)", f"${parity['lhs']:.6f}")
     col_p2.metric("Se⁻ᵍᵀ − Ke⁻ʳᵀ (RHS)", f"${parity['rhs']:.6f}")
     col_p3.metric("Residuo |LHS−RHS|", f"${parity['residual']:.2e}",
-                   delta=("✓ Arbitrage-free" if parity["residual"] < 1e-4 else "✗ Violación detectada"),
+                   delta=(" Arbitrage-free" if parity["residual"] < 1e-4 else " Violación detectada"),
                    delta_color="normal" if parity["residual"] < 1e-4 else "inverse")
 
-    if mode == "Avanzado":
-        st.markdown('<div class="section-header">Paridad a través de strikes</div>', unsafe_allow_html=True)
-        strikes_par = np.linspace(max(S * 0.6, 1), S * 1.4, 80)
-        lhs_arr, rhs_arr, residuals = [], [], []
-        for k in strikes_par:
-            be = BSMEngine(S, k, T, r, sigma, q)
-            c_k = be.call_price()
-            p_k = be.put_price()
-            par = parity_check(c_k, p_k, S, k, T, r, q)
-            lhs_arr.append(par["lhs"])
-            rhs_arr.append(par["rhs"])
-            residuals.append(par["residual"])
+    st.markdown('<div class="section-header">Paridad a través de strikes</div>', unsafe_allow_html=True)
+    strikes_par = np.linspace(max(S * 0.6, 1), S * 1.4, 80)
+    lhs_arr, rhs_arr, residuals = [], [], []
+    for k in strikes_par:
+        be = BSMEngine(S, k, T, r, sigma, q)
+        c_k = be.call_price()
+        p_k = be.put_price()
+        par = parity_check(c_k, p_k, S, k, T, r, q)
+        lhs_arr.append(par["lhs"])
+        rhs_arr.append(par["rhs"])
+        residuals.append(par["residual"])
 
-        fig_par = go.Figure()
-        fig_par.add_trace(go.Scatter(x=strikes_par, y=lhs_arr, name="C − P", line=dict(color=accent, width=2)))
-        fig_par.add_trace(go.Scatter(x=strikes_par, y=rhs_arr, name="Se⁻ᵍᵀ − Ke⁻ʳᵀ",
-                                      line=dict(color="#34d399", width=2, dash="dash")))
-        fig_par.update_layout(**plotly_layout("Paridad Put-Call vs Strike"), height=320)
-        fig_par.update_xaxes(title="Strike K")
-        fig_par.update_yaxes(title="Valor ($)")
-        st.plotly_chart(fig_par, use_container_width=True)
+    fig_par = go.Figure()
+    fig_par.add_trace(go.Scatter(x=strikes_par, y=lhs_arr, name="C − P", line=dict(color=accent, width=2)))
+    fig_par.add_trace(go.Scatter(x=strikes_par, y=rhs_arr, name="Se⁻ᵍᵀ − Ke⁻ʳᵀ",
+                                  line=dict(color="#34d399", width=2, dash="dash")))
+    fig_par.update_layout(**plotly_layout("Paridad Put-Call vs Strike"), height=320)
+    fig_par.update_xaxes(title="Strike K")
+    fig_par.update_yaxes(title="Valor ($)")
+    st.plotly_chart(fig_par, use_container_width=True)

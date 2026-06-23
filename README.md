@@ -4,8 +4,6 @@
 
 ![Python](https://img.shields.io/badge/Python-3.10%2B-blue?logo=python&logoColor=white)
 ![Streamlit](https://img.shields.io/badge/Streamlit-1.32%2B-FF4B4B?logo=streamlit&logoColor=white)
-![License](https://img.shields.io/badge/License-MIT-green)
-![Status](https://img.shields.io/badge/Status-Active-brightgreen)
 
 ---
 
@@ -35,20 +33,20 @@ La página de datos en vivo permite valuar opciones reales sobre cualquier subya
 
 ```
 valuacion_cuantitativa_derivados/
-│
-├── app.py                  # Landing page y navegación
-├── engine.py               # Motor de cálculo — todos los modelos
-├── requirements.txt
-├── README.md
-│
-└── pages/
-    ├── 1_BSM.py            # Black-Scholes-Merton
-    ├── 2_CRR.py            # Árboles CRR (europeo + americano)
-    ├── 3_Heston.py         # Modelo de Heston
-    ├── 4_Merton.py         # Merton jump-diffusion
-    ├── 5_Complementos.py   # Griegas, sonrisa IV, paridad put-call
-    ├── 6_Comparativa.py    # Benchmark cruzado de modelos
-    └── 7_LiveData.py       # Datos en vivo via yfinance
+
+ app.py                  # Landing page y navegación
+ engine.py               # Motor de cálculo — todos los modelos
+ requirements.txt
+ README.md
+
+ pages/
+     1_BSM.py            # Black-Scholes-Merton
+     2_CRR.py            # Árboles CRR (europeo + americano)
+     3_Heston.py         # Modelo de Heston
+     4_Merton.py         # Merton jump-diffusion
+     5_Complementos.py   # Griegas, sonrisa IV, paridad put-call
+     6_Comparativa.py    # Benchmark cruzado de modelos
+     7_LiveData.py       # Datos en vivo via yfinance
 ```
 
 ### `engine.py` — arquitectura interna
@@ -176,7 +174,9 @@ $$V_{i,j} = e^{-r\Delta t}\left[p \cdot V_{i+1,j} + (1-p) \cdot V_{i+1,j+1}\righ
 ## Autor
 
 **Owen** — Estudiante de Actuaría, Universidad de las Américas Puebla (UDLAP)  
+Internship previo en Actinver (Global Equity). Investigación en estimación de riesgo latente con Dynamic Factor Models y filtro de Kalman (CIMAT).
 
+[![GitHub](https://img.shields.io/badge/GitHub-Walls16-181717?logo=github)](https://github.com/Walls16)
 
 ---
 

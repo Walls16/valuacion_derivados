@@ -12,11 +12,11 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# ── Theme persistence ──
+#  Theme persistence 
 if "dark_mode" not in st.session_state:
     st.session_state.dark_mode = True
 
-# ── CSS: dual theme system ──
+#  CSS: dual theme system 
 def inject_css(dark: bool):
     if dark:
         bg        = "#0d0f14"
@@ -58,7 +58,7 @@ def inject_css(dark: bool):
 
     .main .block-container {{ padding-top: 2rem; max-width: 1100px; }}
 
-    /* ── Hero ── */
+    /*  Hero  */
     .hero {{
         padding: 3.5rem 0 2.5rem 0;
         text-align: center;
@@ -90,7 +90,7 @@ def inject_css(dark: bool):
         line-height: 1.7;
     }}
 
-    /* ── Model cards ── */
+    /*  Model cards  */
     .model-grid {{
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
@@ -129,7 +129,7 @@ def inject_css(dark: bool):
         line-height: 1.55;
     }}
 
-    /* ── Stat pills ── */
+    /*  Stat pills  */
     .stat-row {{
         display: flex;
         gap: 1rem;
@@ -156,14 +156,14 @@ def inject_css(dark: bool):
         letter-spacing: 0.05em;
     }}
 
-    /* ── Divider ── */
+    /*  Divider  */
     .vqd-divider {{
         border: none;
         border-top: 1px solid {border};
         margin: 2rem 0;
     }}
 
-    /* ── Section header ── */
+    /*  Section header  */
     .section-header {{
         font-size: 0.7rem;
         font-family: 'JetBrains Mono', monospace;
@@ -173,7 +173,7 @@ def inject_css(dark: bool):
         margin-bottom: 1rem;
     }}
 
-    /* ── Streamlit widget overrides ── */
+    /*  Streamlit widget overrides  */
     .stButton > button {{
         background: {accent} !important;
         color: #ffffff !important;
@@ -234,7 +234,7 @@ def inject_css(dark: bool):
 
 inject_css(st.session_state.dark_mode)
 
-# ── Sidebar ──
+#  Sidebar 
 with st.sidebar:
     st.markdown("### ∂ VQD")
     st.caption("Valuación Cuantitativa de Derivados")
@@ -246,24 +246,9 @@ with st.sidebar:
         st.rerun()
 
     st.divider()
-    st.markdown("**Navegación**")
-    pages = {
-        "Inicio":                  None,
-        "BSM":                     "pages/1_BSM.py",
-        "Árboles CRR":             "pages/2_CRR.py",
-        "Heston":                   "pages/3_Heston.py",
-        "Merton — Saltos":          "pages/4_Merton.py",
-        "Complementos":             "pages/5_Complementos.py",
-        "Comparativa":              "pages/6_Comparativa.py",
-        "Subyacentes en Vivo":     "pages/7_LiveData.py",
-    }
-    for name in pages:
-        st.markdown(f"<div style='padding:0.2rem 0; font-size:0.87rem'>{name}</div>", unsafe_allow_html=True)
-
-    st.divider()
     st.caption("v1.0 · Owen · 2026")
 
-# ── Hero ──
+#  Hero 
 st.markdown("""
 <div class="hero">
     <div class="hero-eyebrow">Valuación Cuantitativa · Derivados Financieros</div>
@@ -277,7 +262,7 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# ── Stat pills ──
+#  Stat pills 
 st.markdown("""
 <div class="stat-row">
     <div class="stat-pill">
@@ -300,7 +285,7 @@ st.markdown("""
 <hr class="vqd-divider">
 """, unsafe_allow_html=True)
 
-# ── Model cards ──
+#  Model cards 
 st.markdown('<div class="section-header">Modelos disponibles</div>', unsafe_allow_html=True)
 st.markdown("""
 <div class="model-grid">
@@ -343,7 +328,7 @@ st.markdown("""
 <hr class="vqd-divider">
 """, unsafe_allow_html=True)
 
-# ── Quick start ──
+#  Quick start 
 st.markdown('<div class="section-header">Inicio rápido</div>', unsafe_allow_html=True)
 col1, col2 = st.columns(2)
 
@@ -356,7 +341,7 @@ with col2:
 st.markdown("")
 st.markdown(
     "<div style='text-align:center; font-size:0.75rem; color:#6b7a99; padding-top:1rem'>"
-    "Valuación Cuantitativa de Derivados · Actuaría · 2026"
+    "Valuación Cuantitativa de Derivados · 2026"
     "</div>",
     unsafe_allow_html=True
 )

@@ -65,15 +65,68 @@ with st.sidebar:
         st.session_state.dark_mode = dark_toggle
         st.rerun()
     st.divider()
-    mode = st.radio("Modo de visualización", ["Básico", "Avanzado"], index=0)
 
 st.markdown('<div class="page-eyebrow">Benchmark · Página 6</div>', unsafe_allow_html=True)
 st.markdown('<div class="page-title">Comparativa de Modelos</div>', unsafe_allow_html=True)
 st.markdown('<div class="page-sub">Divergencia de precios y sensibilidades entre BSM, CRR, Heston y Merton bajo los mismos parámetros base. BSM es el benchmark de referencia.</div>', unsafe_allow_html=True)
+
+st.markdown(f"""
+<div style="background:{card};border:1px solid {border};border-radius:10px;padding:1.4rem 1.6rem;margin:0 0 1.2rem 0;line-height:1.85">
+    <div style="font-size:0.7rem;font-family:JetBrains Mono,monospace;letter-spacing:0.14em;text-transform:uppercase;color:{accent};margin-bottom:0.9rem">
+        C&oacute;mo leer esta comparativa
+    </div>
+    <p style="color:{text_main};font-size:0.88rem;margin:0 0 0.75rem 0">
+        Los cuatro modelos implementados parten de supuestos cada vez m&aacute;s generales sobre la din&aacute;mica del subyacente.
+        Bajo los mismos par&aacute;metros de entrada, sus precios <em>divergen</em> de formas que revelan exactamente
+        qu&eacute; fen&oacute;menos captura cada uno que los dem&aacute;s ignoran.
+        BSM se usa como <strong style="color:{text_main}">benchmark de referencia</strong> porque es el caso l&iacute;mite
+        del que los otros modelos se alejan cuando se activan sus mecanismos adicionales.
+    </p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.8rem 2rem;margin-bottom:0.9rem">
+        <div style="border-left:3px solid #4f8ef7;padding-left:0.8rem;font-size:0.83rem">
+            <div style="color:#4f8ef7;font-family:JetBrains Mono,monospace;margin-bottom:0.3rem">BSM &mdash; referencia</div>
+            <span style="color:{text_sub}">Fija la base: vol constante, log-normalidad perfecta, sin saltos.
+            Cualquier diferencia con los dem&aacute;s modelos es el precio impl&iacute;cito de relajar esos supuestos.</span>
+        </div>
+        <div style="border-left:3px solid #34d399;padding-left:0.8rem;font-size:0.83rem">
+            <div style="color:#34d399;font-family:JetBrains Mono,monospace;margin-bottom:0.3rem">CRR &mdash; discretizaci&oacute;n</div>
+            <span style="color:{text_sub}">Con N grande converge a BSM. La diferencia residual es error de discretizaci&oacute;n.
+            Diverge significativamente de BSM solo en opciones americanas, donde el ejercicio anticipado tiene valor.</span>
+        </div>
+        <div style="border-left:3px solid #a78bfa;padding-left:0.8rem;font-size:0.83rem">
+            <div style="color:#a78bfa;font-family:JetBrains Mono,monospace;margin-bottom:0.3rem">Heston &mdash; vol estoc&aacute;stica</div>
+            <span style="color:{text_sub}">Diverge de BSM especialmente en opciones OTM y de largo plazo,
+            donde la reversi&oacute;n a la media de la varianza importa m&aacute;s.
+            Con &rho; &lt; 0, el put OTM vale m&aacute;s que en BSM (skew negativo endógeno).</span>
+        </div>
+        <div style="border-left:3px solid #f59e0b;padding-left:0.8rem;font-size:0.83rem">
+            <div style="color:#f59e0b;font-family:JetBrains Mono,monospace;margin-bottom:0.3rem">Merton &mdash; saltos</div>
+            <span style="color:{text_sub}">Diverge de BSM m&aacute;s en opciones de corto plazo OTM, donde los saltos
+            dominan sobre la difusi&oacute;n. Con &mu;j &lt; 0, el put OTM recibe una prima significativa vs BSM.</span>
+        </div>
+    </div>
+    <div style="border-top:1px solid {border};margin:0.9rem 0"></div>
+    <div style="font-size:0.7rem;font-family:JetBrains Mono,monospace;letter-spacing:0.14em;text-transform:uppercase;color:{accent};margin-bottom:0.6rem">
+        Jerarqu&iacute;a de modelos y calibraci&oacute;n
+    </div>
+    <p style="color:{text_sub};font-size:0.83rem;margin:0 0 0.4rem 0">
+        En la pr&aacute;ctica, los modelos se <em>calibran</em> al mercado: se ajustan sus par&aacute;metros libres para
+        reproducir los precios de opciones observados. BSM se calibra a una sola IV por opci&oacute;n.
+        Heston y Merton se calibran a toda la superficie IV simult&aacute;neamente (optimizaci&oacute;n sobre 4-5 par&aacute;metros).
+    </p>
+    <p style="color:{text_sub};font-size:0.83rem;margin:0">
+        Un modelo m&aacute;s complejo no es siempre mejor: puede sobreajustar, ser inestable num&eacute;ricamente,
+        o tener par&aacute;metros que no se pueden calibrar robustamente con los datos disponibles.
+        La comparativa de esta p&aacute;gina asume los mismos par&aacute;metros base para todos los modelos,
+        lo que <em>no</em> es c&oacute;mo se usar&iacute;an en producci&oacute;n &mdash; pero s&iacute; permite aislar el efecto puro de cada mecanismo.
+    </p>
+</div>
+""", unsafe_allow_html=True)
+
 st.divider()
 
-# ── Inputs ──
-with st.expander("⚙️ Parámetros comunes", expanded=True):
+#  Inputs 
+with st.expander(" Parámetros comunes", expanded=True):
     c1, c2, c3 = st.columns(3)
     with c1:
         S     = st.number_input("S — precio subyacente", value=100.0, step=1.0, format="%.2f")
@@ -85,7 +138,7 @@ with st.expander("⚙️ Parámetros comunes", expanded=True):
         sigma = st.number_input("σ — volatilidad base (%)", value=20.0, min_value=0.1, step=0.5, format="%.2f") / 100
         q     = st.number_input("q — dividendo (%)", value=0.0, step=0.1, format="%.2f") / 100
 
-with st.expander("⚙️ Parámetros de Heston y Merton", expanded=False):
+with st.expander(" Parámetros de Heston y Merton", expanded=False):
     ch, cm = st.columns(2)
     with ch:
         st.markdown(f"<div style='font-size:0.72rem;color:{text_sub};margin-bottom:0.4rem'>Heston</div>", unsafe_allow_html=True)
@@ -96,10 +149,10 @@ with st.expander("⚙️ Parámetros de Heston y Merton", expanded=False):
     with cm:
         st.markdown(f"<div style='font-size:0.72rem;color:{text_sub};margin-bottom:0.4rem'>Merton</div>", unsafe_allow_html=True)
         m_lam    = st.slider("λ (intensidad)", 0.0, 10.0, 1.0, 0.1, key="m_lam")
-        m_mu_j   = st.slider("μⱼ (media salto)", -1.0, 1.0, -0.1, 0.01, key="m_mu_j")
-        m_sigma_j = st.slider("σⱼ (vol salto)", 0.01, 0.8, 0.15, 0.01, key="m_sigma_j")
+        m_mu_j   = st.slider("μ (media salto)", -1.0, 1.0, -0.1, 0.01, key="m_mu_j")
+        m_sigma_j = st.slider("σ (vol salto)", 0.01, 0.8, 0.15, 0.01, key="m_sigma_j")
 
-# ── Compute all models ──
+#  Compute all models 
 with st.spinner("Calculando todos los modelos..."):
     results = compare_all_models(
         S, K, T, r, sigma, q,
@@ -110,7 +163,7 @@ with st.spinner("Calculando todos los modelos..."):
 bsm_ref_call = results["BSM"]["call"]
 bsm_ref_put  = results["BSM"]["put"]
 
-# ── Summary cards ──
+#  Summary cards 
 st.markdown('<div class="section-header">Precios — Call Europeo</div>', unsafe_allow_html=True)
 cols = st.columns(4)
 for col, (model, color) in zip(cols, MODEL_COLORS.items()):
@@ -161,7 +214,7 @@ def plotly_layout(title=""):
 
 tab1, tab2, tab3 = st.tabs(["Comparativa por strike", "Sensibilidad a σ", "Heatmap de divergencia"])
 
-# ─────────────────────────────
+# 
 with tab1:
     strikes = np.linspace(max(S * 0.6, 1), S * 1.4, 60)
     opt_choice = st.radio("Tipo de opción", ["Call", "Put"], horizontal=True)
@@ -190,7 +243,7 @@ with tab1:
     fig.update_yaxes(title=f"Precio {opt_choice}")
     st.plotly_chart(fig, use_container_width=True)
 
-# ─────────────────────────────
+# 
 with tab2:
     sigmas = np.linspace(0.05, 0.80, 50)
     with st.spinner("Sensibilidad a σ..."):
@@ -209,37 +262,34 @@ with tab2:
     fig2.update_yaxes(title="Precio Call")
     st.plotly_chart(fig2, use_container_width=True)
 
-# ─────────────────────────────
+# 
 with tab3:
-    if mode == "Avanzado":
-        st.markdown(f"<div style='font-size:0.8rem;color:{text_sub};margin-bottom:0.8rem'>Diferencia porcentual de cada modelo vs BSM a través de una grilla de σ × T.</div>", unsafe_allow_html=True)
-        model_heat = st.selectbox("Modelo a comparar vs BSM", ["CRR", "Heston", "Merton"])
+    st.markdown(f"<div style='font-size:0.8rem;color:{text_sub};margin-bottom:0.8rem'>Diferencia porcentual de cada modelo vs BSM a través de una grilla de σ × T.</div>", unsafe_allow_html=True)
+    model_heat = st.selectbox("Modelo a comparar vs BSM", ["CRR", "Heston", "Merton"])
 
-        sigmas_h = np.linspace(0.05, 0.60, 15)
-        mats_h   = np.linspace(0.1, 2.0, 15)
-        Z = np.zeros((len(mats_h), len(sigmas_h)))
+    sigmas_h = np.linspace(0.05, 0.60, 15)
+    mats_h   = np.linspace(0.1, 2.0, 15)
+    Z = np.zeros((len(mats_h), len(sigmas_h)))
 
-        with st.spinner(f"Calculando heatmap {model_heat} vs BSM..."):
-            for i, t_h in enumerate(mats_h):
-                for j, s_h in enumerate(sigmas_h):
-                    bsm_p = BSMEngine(S, K, t_h, r, s_h, q).call_price()
-                    if model_heat == "CRR":
-                        other = CRREngine(S, K, t_h, r, s_h, q, 100).call_price()
-                    elif model_heat == "Heston":
-                        other = HestonEngine(S, K, t_h, r, q, s_h**2, h_kappa, s_h**2, h_xi, h_rho).call_price()
-                    else:
-                        other = MertonEngine(S, K, t_h, r, s_h, q, m_lam, m_mu_j, m_sigma_j).call_price()
-                    Z[i, j] = (other - bsm_p) / bsm_p * 100 if bsm_p > 0.01 else 0.0
+    with st.spinner(f"Calculando heatmap {model_heat} vs BSM..."):
+        for i, t_h in enumerate(mats_h):
+            for j, s_h in enumerate(sigmas_h):
+                bsm_p = BSMEngine(S, K, t_h, r, s_h, q).call_price()
+                if model_heat == "CRR":
+                    other = CRREngine(S, K, t_h, r, s_h, q, 100).call_price()
+                elif model_heat == "Heston":
+                    other = HestonEngine(S, K, t_h, r, q, s_h**2, h_kappa, s_h**2, h_xi, h_rho).call_price()
+                else:
+                    other = MertonEngine(S, K, t_h, r, s_h, q, m_lam, m_mu_j, m_sigma_j).call_price()
+                Z[i, j] = (other - bsm_p) / bsm_p * 100 if bsm_p > 0.01 else 0.0
 
-        fig_h = go.Figure(data=go.Heatmap(
-            z=Z, x=sigmas_h * 100, y=mats_h,
-            colorscale="RdBu_r",
-            zmid=0,
-            colorbar=dict(title="% vs BSM"),
-        ))
-        fig_h.update_layout(**plotly_layout(f"Divergencia {model_heat} vs BSM (%) — grilla σ × T"), height=420)
-        fig_h.update_xaxes(title="σ (%)")
-        fig_h.update_yaxes(title="T (años)")
-        st.plotly_chart(fig_h, use_container_width=True)
-    else:
-        st.info("Activa el **Modo Avanzado** para ver el heatmap de divergencia σ × T.")
+    fig_h = go.Figure(data=go.Heatmap(
+        z=Z, x=sigmas_h * 100, y=mats_h,
+        colorscale="RdBu_r",
+        zmid=0,
+        colorbar=dict(title="% vs BSM"),
+    ))
+    fig_h.update_layout(**plotly_layout(f"Divergencia {model_heat} vs BSM (%) — grilla σ × T"), height=420)
+    fig_h.update_xaxes(title="σ (%)")
+    fig_h.update_yaxes(title="T (años)")
+    st.plotly_chart(fig_h, use_container_width=True)

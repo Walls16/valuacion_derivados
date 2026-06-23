@@ -56,22 +56,73 @@ with st.sidebar:
         st.session_state.dark_mode = dark_toggle
         st.rerun()
     st.divider()
-    mode = st.radio("Modo de visualización", ["Básico", "Avanzado"], index=0)
 
 st.markdown('<div class="page-eyebrow">Árbol Lattice · Página 2</div>', unsafe_allow_html=True)
 st.markdown('<div class="page-title">Cox-Ross-Rubinstein</div>', unsafe_allow_html=True)
 st.markdown('<div class="page-sub">Valuación discreta mediante árbol binomial recombinante. Soporta opciones americanas con ejercicio anticipado.</div>', unsafe_allow_html=True)
 
-if mode == "Avanzado":
-    st.markdown(f"""
-    <div class="formula-box">
-        <strong style="color:{text_main}">Parámetros del árbol</strong><br><br>
-        u = e<sup>σ√Δt</sup> &nbsp;·&nbsp; d = 1/u &nbsp;·&nbsp; Δt = T/N<br><br>
-        p = (e<sup>(r−q)Δt</sup> − d) / (u − d) &nbsp;&nbsp; [probabilidad riesgo-neutral]<br><br>
-        V<sub>i,j</sub> = e<sup>−rΔt</sup> · [p·V<sub>i+1,j</sub> + (1−p)·V<sub>i+1,j+1</sub>]<br><br>
-        <span style="color:{text_sub}">Para opciones americanas: V = max(V_europeo, payoff_intrínseco)</span>
+st.markdown(f"""
+<div class="formula-box">
+    <strong style="color:{text_main}">Parámetros del árbol CRR</strong><br><br>
+    u = e<sup>σ√Δt</sup> &nbsp;·&nbsp; d = 1/u &nbsp;·&nbsp; Δt = T/N<br><br>
+    p = (e<sup>(r−q)Δt</sup> &minus; d) / (u &minus; d) &nbsp;&nbsp;&nbsp; [probabilidad risk-neutral de subida]<br><br>
+    V<sub>i,j</sub> = e<sup>&minus;rΔt</sup> · [p·V<sub>i+1,j</sub> + (1&minus;p)·V<sub>i+1,j+1</sub>] &nbsp;&nbsp;&nbsp; [inducción hacia atrás]<br><br>
+    <span style="color:{text_sub}">Americana: V<sub>i,j</sub> = max(V<sub>europeo</sub>, payoff intrínseco en nodo (i,j))</span>
+</div>
+""", unsafe_allow_html=True)
+
+st.markdown(f"""
+<div style="background:{card};border:1px solid {border};border-radius:10px;padding:1.4rem 1.6rem;margin:0.8rem 0 1.2rem 0;line-height:1.85">
+    <div style="font-size:0.7rem;font-family:JetBrains Mono,monospace;letter-spacing:0.14em;text-transform:uppercase;color:{accent};margin-bottom:0.9rem">
+        Origen e intuición del árbol binomial
     </div>
-    """, unsafe_allow_html=True)
+    <p style="color:{text_main};font-size:0.88rem;margin:0 0 0.75rem 0">
+        El árbol binomial de Cox, Ross y Rubinstein (1979) es una <strong style="color:{text_main}">discretización del proceso
+        continuo de BSM</strong>. La idea es dividir el tiempo al vencimiento T en N pasos iguales de duración Δt = T/N.
+        En cada paso, el precio del subyacente solo puede moverse a dos estados: sube por un factor u o baja por un factor d.
+        Al hacer N → ∞ con los factores correctos, el árbol converge exactamente a la fórmula de BSM.
+    </p>
+    <p style="color:{text_main};font-size:0.88rem;margin:0 0 0.75rem 0">
+        El factor u = e<sup>σ√Δt</sup> no es arbitrario: está calibrado para que la varianza del log-retorno en cada paso
+        sea σ²Δt, replicando exactamente la volatilidad del GBM subyacente.
+        La probabilidad p no es la probabilidad real de que el precio suba —
+        es la <strong style="color:{text_main}">probabilidad risk-neutral</strong>, derivada de imponer la condición de
+        no-arbitraje: el precio esperado descontado debe ser igual al precio actual.
+    </p>
+    <p style="color:{text_main};font-size:0.88rem;margin:0 0 0.75rem 0">
+        El árbol se <strong style="color:{text_main}">resuelve hacia atrás</strong> (backward induction): se calculan
+        los payoffs en los nodos terminales (t=T) y se descuentan paso a paso hasta el nodo raíz (t=0),
+        que es el precio de la opción hoy. La estructura recombinante (u·d = 1) garantiza que el árbol
+        tenga N+1 nodos terminales en lugar de 2<sup>N</sup>, haciendo el cómputo polinomial.
+    </p>
+    <div style="border-top:1px solid {border};margin:0.9rem 0"></div>
+    <div style="font-size:0.7rem;font-family:JetBrains Mono,monospace;letter-spacing:0.14em;text-transform:uppercase;color:{accent};margin-bottom:0.6rem">
+        Opciones americanas — ejercicio anticipado
+    </div>
+    <p style="color:{text_main};font-size:0.88rem;margin:0 0 0.75rem 0">
+        La gran ventaja del árbol sobre BSM es que permite valuar opciones con <strong style="color:{text_main}">ejercicio anticipado</strong>.
+        En cada nodo interno, el tenedor compara el valor de continuar (valor de continuación) contra ejercer inmediatamente (valor intrínseco).
+        El árbol resuelve este problema de control óptimo de forma natural: en cada nodo simplemente se toma el máximo.
+        BSM no puede hacer esto — no existe fórmula cerrada para una put americana (excepto en casos límite).
+    </p>
+    <p style="color:{text_sub};font-size:0.83rem;margin:0 0 0.4rem 0">
+        Nota: para una <em>call americana sobre un activo sin dividendos</em>, nunca es óptimo ejercer anticipadamente —
+        el valor de continuar siempre domina. Prueba: C<sub>americana</sub> = C<sub>europea</sub> en ese caso.
+        Para una <em>put americana</em>, sí puede ser óptimo ejercer anticipadamente (especialmente deep ITM),
+        lo que se refleja en que P<sub>americana</sub> &gt; P<sub>europea</sub>.
+    </p>
+    <div style="border-top:1px solid {border};margin:0.9rem 0"></div>
+    <div style="font-size:0.7rem;font-family:JetBrains Mono,monospace;letter-spacing:0.14em;text-transform:uppercase;color:{accent};margin-bottom:0.6rem">
+        Convergencia y precisión
+    </div>
+    <p style="color:{text_sub};font-size:0.83rem;margin:0">
+        Con N pequeño el árbol es impreciso — la opción solo puede tener un conjunto discreto de payoffs terminales.
+        Con N grande (200-1000) la convergencia a BSM es prácticamente exacta para opciones europeas.
+        Curiosamente, el error oscila alrededor del valor BSM alternando según si N es par o impar
+        (efecto de paridad del árbol). Puedes verlo en la gráfica de convergencia: la serie zigzaguea antes de estabilizarse.
+    </p>
+</div>
+""", unsafe_allow_html=True)
 
 st.divider()
 
@@ -93,13 +144,12 @@ with col_in:
     d  = 1.0 / u
     p  = (np.exp((r - q) * dt) - d) / (u - d)
 
-    if mode == "Avanzado":
-        st.markdown(f"""
-        <div style='background:{card};border:1px solid {border};border-radius:6px;padding:0.8rem 1rem;margin-top:0.6rem;font-family:JetBrains Mono,monospace;font-size:0.78rem;color:{text_sub}'>
-        Δt = {dt:.5f}&nbsp;&nbsp; u = {u:.5f}<br>
-        d  = {d:.5f}&nbsp;&nbsp; p = {p:.5f}
-        </div>
-        """, unsafe_allow_html=True)
+    st.markdown(f"""
+    <div style='background:{card};border:1px solid {border};border-radius:6px;padding:0.8rem 1rem;margin-top:0.6rem;font-family:JetBrains Mono,monospace;font-size:0.78rem;color:{text_sub}'>
+    Δt = {dt:.5f}&nbsp;&nbsp; u = {u:.5f}<br>
+    d  = {d:.5f}&nbsp;&nbsp; p = {p:.5f}
+    </div>
+    """, unsafe_allow_html=True)
 
 crr = CRREngine(S, K, T, r, sigma, q, N, american)
 call_crr = crr.call_price()
@@ -157,8 +207,13 @@ def plotly_layout(title=""):
     )
 
 with tab1:
-    display_steps = st.slider("Pasos a visualizar", min_value=2, max_value=10, value=5)
-    opt_type_tree = st.radio("Tipo de opción", ["call", "put"], horizontal=True)
+    col_t1a, col_t1b, col_t1c = st.columns(3)
+    with col_t1a:
+        display_steps = st.slider("Pasos a visualizar", min_value=2, max_value=10, value=5)
+    with col_t1b:
+        opt_type_tree = st.radio("Tipo de opción", ["call", "put"], horizontal=True)
+    with col_t1c:
+        tree_show = st.radio("Mostrar en nodos", ["Valor opción", "Precio S", "Ambos"], horizontal=False)
 
     crr_vis = CRREngine(S, K, T, r, sigma, q, display_steps, american)
     S_tree, V_tree = crr_vis.full_tree(opt_type_tree, max_display=display_steps)
@@ -175,7 +230,12 @@ with tab1:
             v_val = V_tree[step][j] if V_tree[step] is not None else 0
             node_x.append(x)
             node_y.append(y)
-            node_text.append(f"S={s_val:.2f}<br>V={v_val:.3f}")
+            if tree_show == "Valor opción":
+                node_text.append(f"V={v_val:.3f}")
+            elif tree_show == "Precio S":
+                node_text.append(f"S={s_val:.2f}")
+            else:
+                node_text.append(f"S={s_val:.2f}<br>V={v_val:.3f}")
             node_color.append(v_val)
 
             if step < len(S_tree) - 1:
@@ -195,7 +255,7 @@ with tab1:
         x=node_x, y=node_y, mode="markers+text",
         marker=dict(size=32, color=node_color, colorscale="Blues" if not dark else "Blues",
                     showscale=True, colorbar=dict(title="Valor")),
-        text=[t.split("<br>")[1] for t in node_text],
+        text=[t.split("<br>")[-1] for t in node_text],
         textposition="middle center",
         textfont=dict(size=9, color=text_main),
         hovertext=node_text,
@@ -215,15 +275,29 @@ with tab2:
     conv_calls = [CRREngine(S, K, T, r, sigma, q, n, american).call_price() for n in Ns]
     conv_puts  = [CRREngine(S, K, T, r, sigma, q, n, american).put_price()  for n in Ns]
 
+    show_error = st.checkbox("Mostrar error absoluto vs BSM", value=True)
+
     fig2 = go.Figure()
     fig2.add_trace(go.Scatter(x=Ns, y=conv_calls, name="CRR Call", line=dict(color=accent, width=2)))
     fig2.add_trace(go.Scatter(x=Ns, y=conv_puts,  name="CRR Put",  line=dict(color="#a78bfa", width=2)))
     fig2.add_hline(y=bsm_call, line_dash="dot", line_color="#34d399", annotation_text="BSM Call", annotation_font_color="#34d399")
     fig2.add_hline(y=bsm_put,  line_dash="dot", line_color="#f59e0b", annotation_text="BSM Put",  annotation_font_color="#f59e0b")
-    fig2.update_layout(**plotly_layout("Convergencia del árbol CRR → BSM"), height=380)
+    fig2.update_layout(**plotly_layout("Convergencia del árbol CRR → BSM"), height=340)
     fig2.update_xaxes(title="Número de pasos N")
     fig2.update_yaxes(title="Precio")
     st.plotly_chart(fig2, use_container_width=True)
+
+    if show_error:
+        err_calls = [abs(c - bsm_call) for c in conv_calls]
+        err_puts  = [abs(p - bsm_put)  for p in conv_puts]
+        fig2e = go.Figure()
+        fig2e.add_trace(go.Scatter(x=Ns, y=err_calls, name="|CRR Call - BSM|", line=dict(color=accent, width=1.5)))
+        fig2e.add_trace(go.Scatter(x=Ns, y=err_puts,  name="|CRR Put - BSM|",  line=dict(color="#a78bfa", width=1.5)))
+        fig2e.update_layout(**plotly_layout("Error absoluto de convergencia"), height=260)
+        fig2e.update_xaxes(title="N")
+        fig2e.update_yaxes(title="Error ($)", type="log")
+        st.plotly_chart(fig2e, use_container_width=True)
+        st.caption(f"Oscilación par/impar visible en N pequeño. A N={N}: error call = ${abs(call_crr - bsm_call):.4f}")
 
 with tab3:
     # CRR vs BSM across strikes
